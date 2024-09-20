@@ -6,17 +6,17 @@ services:
         uid: 1000
       context: ./
       dockerfile: ./.docker/php/Dockerfile
-    image: laravel-api
-    container_name: laravel-api
+    image: ${APP_NAME}-api
+    container_name: ${APP_NAME}-api
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
       - ./:/var/www
     networks:
-      - laravel_network
+      - docker_network
 
   db:
-    container_name: laravel-db
+    container_name: ${APP_NAME}-db
     image: postgres:14
     volumes:
       - ./.docker/postgres/pgdata:/var/lib/postgresql/data
@@ -26,11 +26,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
     networks:
-      - laravel_network
+      - docker_network
 
   nginx:
     image: nginx:alpine
-    container_name: laravel-nginx
+    container_name: ${APP_NAME}-nginx
     restart: unless-stopped
     ports:
       - 8000:80
@@ -38,18 +38,18 @@ services:
       - ./:/var/www
       - ./.docker/nginx:/etc/nginx/conf.d/
     networks:
-      - laravel_network
+      - docker_network
 
   redis:
-    container_name: laravel-redis
+    container_name: ${APP_NAME}-redis
     image: redis:6.2-alpine
     environment:
       REDIS_USERNAME: redis
       REDIS_PASSWORD: redis
     command: redis-server --requirepass "${REDIS_PASSWORD}" --appendonly yes
     networks:
-      - laravel_network
+      - docker_network
 
 networks:
-  laravel_network:
+  docker_network:
     driver: bridge
