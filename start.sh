@@ -12,3 +12,7 @@ if [ $NEW_INSTALL ]; then
     docker exec laravel-api php artisan migrate --force
     docker exec laravel-api php artisan db:seed
 fi
+
+echo "\033[0;32m-----------------------------------------------------\033[0m"
+echo "\033[0;32mApplication is available at \033[1mhttp://localhost:8000/api\033[0m"
+echo "\033[0;32m-----------------------------------------------------\033[0m"
