@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
-      - ./code:/var/www
+      - ./:/var/www
     networks:
       - docker_network
 
@@ -35,7 +35,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ./app:/var/www
+      - ./:/var/www
       - ./.docker/nginx:/etc/nginx/conf.d/
     networks:
       - docker_network
