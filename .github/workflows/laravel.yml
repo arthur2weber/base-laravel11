@@ -11,44 +11,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        path: ./code
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Show current directory
+      run: echo "Working directory is ${{ github.workspace }}"
 
     - name: Set up PHP
-      uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+      uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0'
+        php-version: '8.2'
 
     - name: Copy .env
-      working-directory: ./code
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      run: php -r "file_exists('${{ github.workspace }}/code/.env') || copy('${{ github.workspace }}/code/.env.example', '${{ github.workspace }}/code/.env');"
 
     - name: Install Dependencies
-      working-directory: ./code
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      working-directory: ${{ github.workspace }}/code
 
     - name: Generate key
-      working-directory: ./code
       run: php artisan key:generate
+      working-directory: ${{ github.workspace }}/code
 
     - name: Directory Permissions
-      working-directory: ./code
       run: chmod -R 777 storage bootstrap/cache
+      working-directory: ${{ github.workspace }}/code
 
     - name: Create Database
-      working-directory: ./code
       run: |
         mkdir -p database
         touch database/database.sqlite
+      working-directory: ${{ github.workspace }}/code
 
     - name: Run Laravel Pint (Code Formatting)
-      working-directory: ./code
       run: vendor/bin/pint
+      working-directory: ${{ github.workspace }}/code
 
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
-      working-directory: ./code
       env:
         DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
+        DB_DATABASE: ${{ github.workspace }}/code/database/database.sqlite
       run: php artisan test
+      working-directory: ${{ github.workspace }}/code
