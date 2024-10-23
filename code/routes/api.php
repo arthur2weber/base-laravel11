@@ -8,5 +8,5 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::get('/', function () {
-    return dd('hello worlds');
+    return dd('hello world');
 });
