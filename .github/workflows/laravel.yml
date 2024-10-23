@@ -1,0 +1,55 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Show current directory
+      run: echo "Working directory is ${{ github.workspace }}"
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Copy .env
+      run: php -r "file_exists('${{ github.workspace }}/code/.env') || copy('${{ github.workspace }}/code/.env.example', '${{ github.workspace }}/code/.env');"
+
+    - name: Install Dependencies
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      working-directory: ${{ github.workspace }}/code
+
+    - name: Generate key
+      run: php artisan key:generate
+      working-directory: ${{ github.workspace }}/code
+
+    - name: Directory Permissions
+      run: chmod -R 777 storage bootstrap/cache
+      working-directory: ${{ github.workspace }}/code
+
+    - name: Create Database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+      working-directory: ${{ github.workspace }}/code
+
+    - name: Run Laravel Pint (Code Formatting)
+      run: vendor/bin/pint
+      working-directory: ${{ github.workspace }}/code
+
+    - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: ${{ github.workspace }}/code/database/database.sqlite
+      run: php artisan test
+      working-directory: ${{ github.workspace }}/code
