@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        path: ./code/**
+        path: ./code  # Define o caminho correto para clonar o repositório
 
     - name: Set up PHP
       uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
@@ -25,7 +26,7 @@ jobs:
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
     - name: Install Dependencies
-      working-directory: ./code/**
+      working-directory: ./code
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Generate key
